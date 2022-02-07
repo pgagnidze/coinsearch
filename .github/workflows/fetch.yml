@@ -1,0 +1,27 @@
+name: Fetch Coins
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 8 * * *"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          repository: pgagnidze/coinsearch
+          token: ${{ secrets.GH_PAT }}
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: Execute a program
+        env:
+          NOTION_ACCESS_TOKEN: ${{ secrets.NOTION_ACCESS_TOKEN }}
+          NOTION_DATABASE_ID: ${{ secrets.NOTION_DATABASE_ID }}
+          CMC_PRO_API_KEY: ${{ secrets.CMC_PRO_API_KEY }}
+          CMC_PRO_API_URL: ${{ secrets.CMC_PRO_API_URL }}
+        run: |
+          npm install
+          npm run start
