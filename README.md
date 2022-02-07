@@ -13,6 +13,8 @@ To run this project, you will need to add the following environment variables
 `CMC_PRO_API_URL`
 `NOTION_DATABASE_ID`
 
+`GH_PAT`(Optional) - Github personal access token for Github Actions to access private repos
+
 You can create your Notion API key [here](https://www.notion.com/my-integrations)
 
 You can create your CoinMarketCap API key [here](https://coinmarketcap.com/api/)
@@ -50,3 +52,5 @@ Start the server
 - Adds new entries automatically
 - Updates only the modified fields
 - Configures portfolios from the data files
+
+Currently, Notion does not review public integrations and does not list all public integrations in a directory. If you want to use and modify this integration, please fork this repository and add above environment variables in the secrets.
