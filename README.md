@@ -3,6 +3,7 @@
 
 This Notion integration syncs coins from CoinMarketCap for a specific portfolio to a Notion Database. This integration was built on Notion and Coinmarketcap APIs.
 
+You can check a small backstory [here](https://papu.substack.com/p/venture-coin-database)
 
 ## Environment Variables
 
