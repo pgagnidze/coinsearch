@@ -1,51 +1,51 @@
 export type Coin = {
-  id?: string;
-  name: string;
-  tags: Array<{ name: string }>;
-  slug: string;
-  symbol: string;
-  website: string;
-  doc: string;
-};
+  id?: string
+  name: string
+  tags: Array<{ name: string }>
+  slug: string
+  symbol: string
+  website: string
+  doc: string
+}
 
 export type CmcCoinRemote = {
-  tags: Array<string>;
-  name: string;
-  slug: string;
-  symbol: string;
-  urls: { website: Array<string>; technical_doc: Array<string> };
-};
+  tags: Array<string>
+  name: string
+  slug: string
+  symbol: string
+  urls: { website: Array<string>; technical_doc: Array<string> }
+}
 
 export type NotionCoinRemote = {
-  id: string;
+  id: string
   properties: {
     Tags: {
       multi_select: {
-        name: string;
-        id: string;
-        color: string;
-      }[];
-    };
+        name: string
+        id: string
+        color: string
+      }[]
+    }
     Name: {
       title: {
-        text: { content: string };
-      }[];
-    };
+        text: { content: string }
+      }[]
+    }
     Slug: {
       title: {
-        text: { content: string };
-      }[];
-    };
+        text: { content: string }
+      }[]
+    }
     Symbol: {
       title: {
-        text: { content: string };
-      }[];
-    };
+        text: { content: string }
+      }[]
+    }
     Website: {
-      url: string;
-    };
+      url: string
+    }
     Doc: {
-      url: string;
-    };
-  };
-};
+      url: string
+    }
+  }
+}

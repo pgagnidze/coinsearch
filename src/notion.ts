@@ -1,31 +1,31 @@
-import { Client } from '@notionhq/client';
-import { Coin, NotionCoinRemote } from './types/coins';
-import { chunk, capitalize } from './utils/utils';
+import { Client } from 'https://deno.land/x/notion_sdk@v0.4.12/src/mod.ts'
+import { Coin, NotionCoinRemote } from './types/coins.ts'
+import { chunk, capitalize } from './utils/utils.ts'
 
 class Notion extends Client {
-  private db: string;
+  private db: string
   constructor({ key, db }: { key: string; db: string }) {
-    super({ auth: key });
-    this.db = db;
+    super({ auth: key })
+    this.db = db
   }
 
   async createEntries(coins: Coin[]) {
-    const pagesToCreateChunks = chunk(coins, 1);
+    const pagesToCreateChunks = chunk(coins, 1)
     for (const pagesToCreateBatch of pagesToCreateChunks) {
       await Promise.all(
-        pagesToCreateBatch.map(async (coin: Coin) =>
+        pagesToCreateBatch.map((coin: Coin) =>
           this.pages.create({
             parent: { database_id: this.db },
             properties: this.getPropertiesFromCoin(coin),
           }),
         ),
-      );
-      console.log(`Created batch size: ${pagesToCreateBatch.length}`);
+      )
+      console.log(`Created batch size: ${pagesToCreateBatch.length}`)
     }
   }
 
   async removeEntries(coins: Coin[]) {
-    const pagesToUpdateChunks = chunk(coins, 10);
+    const pagesToUpdateChunks = chunk(coins, 10)
     for (const pagesToUpdateBatch of pagesToUpdateChunks) {
       await Promise.all(
         pagesToUpdateBatch.map((coin: Coin) =>
@@ -34,13 +34,13 @@ class Notion extends Client {
             archived: true,
           }),
         ),
-      );
-      console.log(`Removed batch size: ${pagesToUpdateBatch.length}`);
+      )
+      console.log(`Removed batch size: ${pagesToUpdateBatch.length}`)
     }
   }
 
   async updateEntries(coins: unknown[]) {
-    const pagesToUpdateChunks = chunk(coins, 1);
+    const pagesToUpdateChunks = chunk(coins, 1)
     for (const pagesToUpdateBatch of pagesToUpdateChunks) {
       await Promise.all(
         pagesToUpdateBatch.map(({ id, ...coin }: Coin) =>
@@ -49,12 +49,12 @@ class Notion extends Client {
             properties: this.getPropertiesFromCoin(coin),
           }),
         ),
-      );
-      console.log(`Updated batch size: ${pagesToUpdateBatch.length}`);
+      )
+      console.log(`Updated batch size: ${pagesToUpdateBatch.length}`)
     }
   }
 
-  async updateDb({ tags }: { tags: Array<{ name: string }> }) {
+  updateDb({ tags }: { tags: Array<{ name: string }> }) {
     return this.databases.update({
       database_id: this.db,
       icon: {
@@ -111,83 +111,74 @@ class Notion extends Client {
           url: {},
         },
       },
-    });
+    })
   }
 
   async getCoins() {
-    const notionEntries: Coin[] = [];
-    let cursor: string | undefined = undefined;
+    const notionEntries: Coin[] = []
+    let cursor: string | undefined = undefined
     while (true) {
       const { results, next_cursor } = await this.databases.query({
         database_id: this.db,
         start_cursor: cursor,
-      });
+      })
       const result = results
         ? (results as unknown as NotionCoinRemote[]).map(
-            (page: NotionCoinRemote) => {
-              return {
-                id: page.id,
-                tags:
-                  page.properties.Tags.multi_select.length > 0
-                    ? page.properties.Tags.multi_select.map(
-                        (tag: { name: string }) => ({
-                          name: tag.name,
-                        }),
-                      )
-                    : [],
-                name: page.properties.Name.title[0]
-                  ? page.properties.Name.title[0].text.content
-                  : 'NA',
-                slug: page.properties.Slug.title[0]
-                  ? page.properties.Slug.title[0].text.content
-                  : 'NA',
-                symbol: page.properties.Symbol.title[0]
-                  ? page.properties.Symbol.title[0].text.content
-                  : 'NA',
-                website: page.properties.Website.url,
-                doc: page.properties.Doc.url,
-              };
-            },
-          )
-        : [];
-      notionEntries.push(...result);
+          (page: NotionCoinRemote) => {
+            return {
+              id: page.id,
+              tags:
+                page.properties.Tags.multi_select.length > 0
+                  ? page.properties.Tags.multi_select.map(
+                    (tag: { name: string }) => ({
+                      name: tag.name,
+                    }),
+                  )
+                  : [],
+              name: page.properties.Name.title[0]
+                ? page.properties.Name.title[0].text.content
+                : 'NA',
+              slug: page.properties.Slug.title[0]
+                ? page.properties.Slug.title[0].text.content
+                : 'NA',
+              symbol: page.properties.Symbol.title[0]
+                ? page.properties.Symbol.title[0].text.content
+                : 'NA',
+              website: page.properties.Website.url,
+              doc: page.properties.Doc.url,
+            }
+          },
+        )
+        : []
+      notionEntries.push(...result)
       if (!next_cursor) {
-        break;
+        break
       }
-      cursor = next_cursor;
+      cursor = next_cursor
     }
 
-    console.log(`${notionEntries.length} pages successfully fetched.`);
+    console.log(`${notionEntries.length} pages successfully fetched.`)
 
-    return notionEntries;
+    return notionEntries
   }
 
-  async retrieveDb() {
-    const { properties, last_edited_time, url } = (await this.databases
-      .retrieve({
-        database_id: this.db,
-      })
-      .catch((err) => {
-        throw err;
-      })) as { properties: object; last_edited_time: string; url: string };
-    return {
-      properties,
-      last_edited_time,
-      url,
-    };
+  retrieveDb() {
+    return this.databases.retrieve({
+      database_id: this.db,
+    })
   }
 
   private getPropertiesFromCoin(coin: Coin) {
-    const propertyValues = {};
+    const propertyValues = {}
     for (const [key, value] of Object.entries(coin)) {
       if (key === 'tags') {
         propertyValues[capitalize(key)] = {
           multi_select: value || [{ name: 'NA' }],
-        };
+        }
       } else if (key === 'website' || key === 'doc') {
         propertyValues[capitalize(key)] = {
           url: value || 'NA',
-        };
+        }
       } else {
         propertyValues[capitalize(key)] = {
           title: [
@@ -197,12 +188,12 @@ class Notion extends Client {
               },
             },
           ],
-        };
+        }
       }
     }
 
-    return propertyValues;
+    return propertyValues
   }
 }
 
-export default Notion;
+export default Notion

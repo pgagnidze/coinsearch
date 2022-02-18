@@ -1,12 +1,12 @@
 const access = {
   notion: {
-    key: process.env.NOTION_ACCESS_TOKEN || '',
-    db: process.env.NOTION_DATABASE_ID || '',
+    key: Deno.env.get('NOTION_ACCESS_TOKEN') || '',
+    db: Deno.env.get('NOTION_DATABASE_ID') || '',
   },
   cmc: {
-    key: process.env.CMC_PRO_API_KEY || '',
-    url: process.env.CMC_PRO_API_URL || '',
+    key: Deno.env.get('CMC_PRO_API_KEY') || '',
+    url: Deno.env.get('CMC_PRO_API_URL') || '',
   },
-};
+}
 
-export default access;
+export default access

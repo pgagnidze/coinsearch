@@ -35,18 +35,11 @@ Go to the project directory
   cd coinsearch
 ```
 
-Install dependencies
+Start the program
 
 ```bash
-  npm install
+  deno run  --allow-env --allow-net src/index.ts
 ```
-
-Start the server
-
-```bash
-  npm run start
-```
-
 
 ## Features
 
