@@ -1,0 +1,21 @@
+{
+    "files.eol": "\n",
+    "files.trimTrailingWhitespace": true,
+    "typescript.format.semicolons": "remove",
+    "typescript.preferences.quoteStyle": "single",
+    "[typescript]": {
+      "editor.defaultFormatter": "vscode.typescript-language-features",
+      "editor.formatOnSave": true,
+      "editor.codeActionsOnSave": {
+        "source.organizeImports": true,
+      }
+    },
+    "deno.enable": true,
+    "deno.unstable": true,
+    "deno.lint": true,
+    "deno.config": "./deno.json",
+    "deno.suggest.imports.hosts": {
+      "https://deno.land": true,
+      "https://esm.sh": false
+    }
+  }
