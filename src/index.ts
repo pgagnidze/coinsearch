@@ -2,7 +2,7 @@ import CoinMarketCap from './coinmarketcap';
 import Notion from './notion';
 import access from './config/access';
 import ventures from './data/ventures';
-import { updatedDiff } from 'deep-object-diff';
+import { orderedDiff } from './utils/utils';
 
 const notion = new Notion({
   key: access.notion.key,
@@ -44,10 +44,8 @@ const cmc = new CoinMarketCap({
     const notionEntry = notionEntries.find(
       (x) => x.slug === item.slug,
     ) as object;
-    const notionDiff = updatedDiff(notionEntry, cmcEntry);
+    const notionDiff = orderedDiff(notionEntry, cmcEntry);
     if (Object.keys(notionDiff).length > 0) {
-      if (notionDiff.hasOwnProperty('tags'))
-        notionDiff['tags'] = cmcEntry['tags'];
       notionDiff['id'] = notionEntry ? notionEntry['id'] : '';
       updateEntries.push(notionDiff);
     }

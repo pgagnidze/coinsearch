@@ -1,6 +1,7 @@
 import CmcRequest from './cmcrequest';
 import routes from './data/routes';
 import { CmcCoinRemote, Coin } from './types/coins';
+import { glueSlugs } from './utils/utils';
 
 class CoinMarketCap extends CmcRequest {
   ventures: Array<{ name: string; slug: string }>;
@@ -36,14 +37,14 @@ class CoinMarketCap extends CmcRequest {
     }
     const flattenedCoins = allCoins.flat();
 
-    const coins = {} as { id: string; slug: string }[];
+    const coins = {} as { id: string; slug: string };
     flattenedCoins.forEach((coin: { id: string; slug: string }) => {
       if (!coins[coin.id]) {
         coins[coin.id] = coin.slug;
       }
     });
 
-    const slugParams = this.glueSlugs(coins);
+    const slugParams = glueSlugs(coins);
 
     const info = await this.get({
       route: routes.info.replace(/:slug/, slugParams),
@@ -67,15 +68,6 @@ class CoinMarketCap extends CmcRequest {
     });
 
     return cmcEntries;
-  }
-
-  private glueSlugs(coins: { id: string; slug: string }[]) {
-    let slugParams = '';
-    for (const slug of Object.values(coins)) {
-      slugParams += `${slug},`;
-    }
-    slugParams = slugParams.slice(0, -1);
-    return slugParams;
   }
 }
 

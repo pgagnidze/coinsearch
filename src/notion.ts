@@ -1,5 +1,6 @@
 import { Client } from '@notionhq/client';
 import { Coin, NotionCoinRemote } from './types/coins';
+import { chunk, capitalize } from './utils/utils';
 
 class Notion extends Client {
   private db: string;
@@ -9,7 +10,7 @@ class Notion extends Client {
   }
 
   async createEntries(coins: Coin[]) {
-    const pagesToCreateChunks = this.chunk(coins, 1);
+    const pagesToCreateChunks = chunk(coins, 1);
     for (const pagesToCreateBatch of pagesToCreateChunks) {
       await Promise.all(
         pagesToCreateBatch.map(async (coin: Coin) =>
@@ -24,7 +25,7 @@ class Notion extends Client {
   }
 
   async removeEntries(coins: Coin[]) {
-    const pagesToUpdateChunks = this.chunk(coins, 10);
+    const pagesToUpdateChunks = chunk(coins, 10);
     for (const pagesToUpdateBatch of pagesToUpdateChunks) {
       await Promise.all(
         pagesToUpdateBatch.map((coin: Coin) =>
@@ -39,7 +40,7 @@ class Notion extends Client {
   }
 
   async updateEntries(coins: unknown[]) {
-    const pagesToUpdateChunks = this.chunk(coins, 1);
+    const pagesToUpdateChunks = chunk(coins, 1);
     for (const pagesToUpdateBatch of pagesToUpdateChunks) {
       await Promise.all(
         pagesToUpdateBatch.map(({ id, ...coin }: Coin) =>
@@ -54,68 +55,63 @@ class Notion extends Client {
   }
 
   async updateDb({ tags }: { tags: Array<{ name: string }> }) {
-    const response = await this.databases
-      .update({
-        database_id: this.db,
-        icon: {
-          type: 'emoji',
-          emoji: '💎',
+    return this.databases.update({
+      database_id: this.db,
+      icon: {
+        type: 'emoji',
+        emoji: '💎',
+      },
+      cover: {
+        type: 'external',
+        external: {
+          url: 'https://www.artic.edu/iiif/2/b3974542-b9b4-7568-fc4b-966738f61d78/full/1686,/0/default.jpg',
         },
-        cover: {
-          type: 'external',
-          external: {
-            url: 'https://www.artic.edu/iiif/2/b3974542-b9b4-7568-fc4b-966738f61d78/full/1686,/0/default.jpg',
+      },
+      title: [
+        {
+          text: {
+            content: 'Venture Coin Database ',
           },
-        },
-        title: [
-          {
-            text: {
-              content: 'Venture Coin Database ',
-            },
-            annotations: {
-              bold: true,
-              italic: false,
-              strikethrough: false,
-              underline: false,
-              code: false,
-              color: 'default',
-            },
-          },
-          {
-            mention: {
-              date: {
-                start: new Date().toISOString(),
-              },
-            },
-          },
-        ],
-        properties: {
-          Tags: {
-            multi_select: {
-              options: tags || [{ name: 'NA' }],
-            },
-          },
-          Name: {
-            title: {},
-          },
-          Symbol: {
-            title: {},
-          },
-          Slug: {
-            title: {},
-          },
-          Website: {
-            url: {},
-          },
-          Doc: {
-            url: {},
+          annotations: {
+            bold: true,
+            italic: false,
+            strikethrough: false,
+            underline: false,
+            code: false,
+            color: 'default',
           },
         },
-      })
-      .catch((err) => {
-        throw err;
-      });
-    return response;
+        {
+          mention: {
+            date: {
+              start: new Date().toISOString(),
+            },
+          },
+        },
+      ],
+      properties: {
+        Tags: {
+          multi_select: {
+            options: tags || [{ name: 'NA' }],
+          },
+        },
+        Name: {
+          title: {},
+        },
+        Symbol: {
+          title: {},
+        },
+        Slug: {
+          title: {},
+        },
+        Website: {
+          url: {},
+        },
+        Doc: {
+          url: {},
+        },
+      },
+    });
   }
 
   async getCoins() {
@@ -185,15 +181,15 @@ class Notion extends Client {
     const propertyValues = {};
     for (const [key, value] of Object.entries(coin)) {
       if (key === 'tags') {
-        propertyValues[this.capitalize(key)] = {
+        propertyValues[capitalize(key)] = {
           multi_select: value || [{ name: 'NA' }],
         };
       } else if (key === 'website' || key === 'doc') {
-        propertyValues[this.capitalize(key)] = {
+        propertyValues[capitalize(key)] = {
           url: value || 'NA',
         };
       } else {
-        propertyValues[this.capitalize(key)] = {
+        propertyValues[capitalize(key)] = {
           title: [
             {
               text: {
@@ -206,19 +202,6 @@ class Notion extends Client {
     }
 
     return propertyValues;
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private chunk(input: any[], size: number) {
-    return input.reduce((arr, item, idx: number) => {
-      return idx % size === 0
-        ? [...arr, [item]]
-        : [...arr.slice(0, -1), [...arr.slice(-1)[0], item]];
-    }, []);
-  }
-
-  private capitalize(str: string) {
-    return str.trim().replace(/^\w/, (c) => c.toUpperCase());
   }
 }
 
