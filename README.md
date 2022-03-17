@@ -1,5 +1,6 @@
 
 # Coinsearch
+[![Fetch Coins](https://github.com/pgagnidze/coinsearch/actions/workflows/fetch.yml/badge.svg)](https://github.com/pgagnidze/coinsearch/actions/workflows/fetch.yml)
 
 This Notion integration syncs coins from CoinMarketCap for a specific portfolio to a Notion Database. This integration was built on Notion and Coinmarketcap APIs.
 
