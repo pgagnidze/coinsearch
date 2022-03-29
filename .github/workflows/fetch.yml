@@ -15,7 +15,7 @@ jobs:
           token: ${{ secrets.GH_PAT }}
       - uses: denoland/setup-deno@v1
         with:
-          deno-version: v1.x
+          deno-version: v1.18.2
       - name: Execute a program
         env:
           NOTION_ACCESS_TOKEN: ${{ secrets.NOTION_ACCESS_TOKEN }}
