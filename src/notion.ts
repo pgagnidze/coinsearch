@@ -1,4 +1,4 @@
-import { Client } from 'https://deno.land/x/notion_sdk@v1.0.3/src/mod.ts'
+import { Client } from 'https://deno.land/x/notion_sdk@v1.0.4/src/mod.ts'
 import { Coin, NotionCoinRemote } from './types/coins.ts'
 import { chunk, capitalize } from './utils/utils.ts'
 
